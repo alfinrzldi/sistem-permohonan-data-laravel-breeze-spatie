@@ -36,6 +36,11 @@ class AuthenticatedSessionController extends Controller
             return redirect()->to('permohonan');
         }
 
+
+    if (Auth::user()->can('lihat-permohonan') || Auth::user()->can('tambah-permohonan')) {
+        return redirect()->to('permohonan');
+    }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 

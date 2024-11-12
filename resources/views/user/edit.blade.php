@@ -2,8 +2,8 @@
 
 @section('content')
 <div class="p-6">
-    <h1 class="font-poppins font-bold text-xl">Manajemen Akun</h1>
-    <p class="font-poppins text-gray-400">Edit akun user atau admin</p>
+    <h1 class="font-poppins font-bold text-xl">Manajemen User</h1>
+    <p class="font-poppins text-gray-400">Edit akun pengguna</p>
 </div>
 <div class="px-6 py-2">
     <div class="bg-white rounded-md border border-gray-100 shadow-black/5 p-6">

@@ -10,9 +10,9 @@
 </head>
 <body class="bg-gray-100">
     <div class="flex items-center justify-center h-screen">
-        <div class="bg-white shadow-2xl h-full w-full flex">
+        <div class="bg-white shadow-2xl h-full w-full flex flex-col md:flex-row">
             <!-- Left Side (Form) -->
-            <div class="w-1/2 p-16 flex flex-col justify-center">
+            <div class="w-full md:w-1/2 p-8 md:p-16 flex flex-col justify-center">
                 <div class="flex flex-col items-center mb-5">
                     <!-- Logo -->
                     <img src="{{ asset('img/logo/logo lama.png') }}" alt="Logo PUPR" class="h-24 mb-3" />
@@ -56,7 +56,7 @@
             </div>
 
             <!-- Right Side (Swiper Slider for Image) -->
-            <div class="w-1/2 bg-black hidden md:block relative">
+            <div class="w-full md:w-1/2 bg-black hidden md:block relative">
                 <div class="swiper mySwiper h-full">
                     <div class="swiper-wrapper">
                         <div class="swiper-slide">

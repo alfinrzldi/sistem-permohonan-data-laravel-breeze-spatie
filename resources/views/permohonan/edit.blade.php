@@ -144,13 +144,13 @@
                     value="{{ old('tujuan_lainnya', $permohonan->tujuan_lainnya) }}" />
                 </div>
                 
-                <label class="block mb-6">
+                {{-- <label class="block mb-6">
                     <span class="mb-2 block text-sm font-poppins text-slate-700">
                         Waktu Selesai
                     </span>
                     <input type="datetime-local" name="waktu_selesai" class="mt-1 px-3 py-2 bg-gray-100 border shadow-sm border-slate-200 placeholder-gray-400 focus:outline-none focus:border-gray-300 focus:ring-gray-300 block w-full rounded-md sm:text-sm focus:ring-1"
                     value="{{ old('waktu_selesai', $permohonan->waktu_selesai ? date('Y-m-d\TH:i', strtotime($permohonan->waktu_selesai)) : '') }}" />
-                </label>
+                </label> --}}
                 
                 
                 <button type="submit" class="font-bold w-20 h-10 mt-1 px-3 py-2 bg-blue-800 border shadow-sm border-blue-800 block rounded-md sm:text-sm text-white hover:bg-blue-900 hover:text-white">

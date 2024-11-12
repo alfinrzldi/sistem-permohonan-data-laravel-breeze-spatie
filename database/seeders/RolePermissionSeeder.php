@@ -23,21 +23,35 @@ class RolePermissionSeeder extends Seeder
         Permission::create(['name'=>'edit-permohonan']);
         Permission::create(['name'=>'hapus-permohonan']);
         Permission::create(['name'=>'lihat-permohonan']);
-        
-        Role::create(['name'=>'admin']);
-        Role::create(['name'=>'pemohon']);
 
-        $roleAdmin = Role::findByName('admin');
-        $roleAdmin->givePermissionTo('tambah-user');
-        $roleAdmin->givePermissionTo('edit-user');
-        $roleAdmin->givePermissionTo('hapus-user');
-        $roleAdmin->givePermissionTo('lihat-user');
+        Permission::create(['name'=>'tambah-role']);
+        Permission::create(['name'=>'edit-role']);
+        Permission::create(['name'=>'hapus-role']);
+
+        Permission::create(['name'=>'tambah-permission']);
+        Permission::create(['name'=>'edit-permission']);
+        Permission::create(['name'=>'hapus-permission']);
 
         
-        $rolePenulis = Role::findByName('pemohon');
-        $rolePenulis->givePermissionTo('tambah-permohonan');
-        $rolePenulis->givePermissionTo('edit-permohonan');
-        $rolePenulis->givePermissionTo('hapus-permohonan');
-        $rolePenulis->givePermissionTo('lihat-permohonan');
+        Role::create(['name'=>'super-admin']);
+
+
+        $rolesuperAdmin = Role::findByName('super-admin');
+        $rolesuperAdmin->givePermissionTo('tambah-user');
+        $rolesuperAdmin->givePermissionTo('edit-user');
+        $rolesuperAdmin->givePermissionTo('hapus-user');
+        $rolesuperAdmin->givePermissionTo('lihat-user');
+        $rolesuperAdmin->givePermissionTo('tambah-permohonan');
+        $rolesuperAdmin->givePermissionTo('edit-permohonan');
+        $rolesuperAdmin->givePermissionTo('lihat-permohonan');
+        $rolesuperAdmin->givePermissionTo('hapus-permohonan');
+        $rolesuperAdmin->givePermissionTo('tambah-role');
+        $rolesuperAdmin->givePermissionTo('edit-role');
+        $rolesuperAdmin->givePermissionTo('hapus-role');
+        $rolesuperAdmin->givePermissionTo('tambah-permission');
+        $rolesuperAdmin->givePermissionTo('edit-permission');
+        $rolesuperAdmin->givePermissionTo('hapus-permission');
+
+        
     }
 }

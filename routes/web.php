@@ -8,9 +8,14 @@ use App\Http\Controllers\PermohonanController;
 use App\http\Controllers\DashboardController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
+use GuzzleHttp\Middleware;
 
 Route::get('/', function () {
     return redirect()->route('login'); // Mengarahkan ke halaman login
+});
+
+Route::fallback(function () {
+    return view('errors.index');
 });
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified', 'role:admin|super-admin'])->name('dashboard');
@@ -30,14 +35,22 @@ Route::post('/survey', [SurveyController::class, 'store'])->name('survey.store')
 // Route untuk pemohon
 Route::get('/permohonan', [PermohonanController::class, 'index'])->middleware(['auth', 'permission:lihat-permohonan'])->name('permohonan.index');
 Route::get('/permohonan/create', [PermohonanController::class, 'create'])->middleware(['auth', 'verified', 'role_or_permission:tambah-permohonan|pemohon'])->name('permohonan.create');
-Route::post('/permohonan', [PermohonanController::class, 'store'])->middleware(['auth', 'role:pemohon'])->name('permohonan.store');
+Route::post('/permohonan', [PermohonanController::class, 'store'])->middleware(['auth', 'role_or_permission:tambah-permohonan|pemohon'])->name('permohonan.store');
 Route::get('/permohonan/{permohonan}', [PermohonanController::class, 'show'])->middleware(['auth', 'role_or_permission:lihat-permohonan|pemohon'])->name('permohonan.show');
 
-// Route untuk admin (bisa melakukan semua aksi)
-Route::get('/permohonan/{id}/edit', [PermohonanController::class, 'edit'])->middleware(['auth', 'role:admin' ])->name('permohonan.edit');
+Route::middleware('auth')->group(function () {
+    // Rute untuk halaman edit
+    Route::get('permohonan/{permohonan}/edit', [PermohonanController::class, 'edit'])->middleware('auth', 'role:admin|super-admin|pengelola-permohonan')->name('permohonan.edit');
 
-// Route untuk admin (hanya admin yang dapat menghapus permohonan)
-Route::delete('/permohonan/{id}', [PermohonanController::class, 'destroy'])->middleware(['auth', 'role:admin'])->name('permohonan.destroy');
+    // Rute untuk update permohonan
+    Route::put('permohonan/{permohonan}', [PermohonanController::class, 'update'])->middleware('auth', 'role:admin|super-admin|pengelola-permohonan')->name('permohonan.update');
+
+    // Rute untuk menghapus permohonan
+    Route::delete('permohonan/{permohonan}', [PermohonanController::class, 'destroy'])->middleware('auth', 'role:admin|super-admin|pengelola-permohonan')->name('permohonan.destroy');
+});
+
+Route::get('/user/create_admin', [UserController::class, 'create_admin'])->name('user.create_admin');
+Route::post('/user/store_admin', [UserController::class, 'store_admin'])->name('user.store_admin');
 
 
 // Route::resource('permohonan', PermohonanController::class)->middleware(['auth', 'role:admin']);
@@ -46,11 +59,11 @@ Route::resource('user', UserController::class)->middleware(['auth', 'permission:
 // Tambahan route untuk upload dan updateStatus
 Route::get('/permohonan/{id}/upload', [PermohonanController::class, 'uploadForm'])->middleware(['auth', 'role:admin|super-admin'])->name('permohonan.uploadForm');
 Route::post('/permohonan/{id}/upload', [PermohonanController::class, 'upload'])->middleware(['auth', 'role:admin|super-admin'])->name('permohonan.upload');
-Route::get('/permohonan/update-status/{id}/{status}', [PermohonanController::class, 'updateStatus'])->middleware(['auth', 'role:super-admin', 'role:admin'])->name('permohonan.updateStatus');
+Route::get('/permohonan/update-status/{id}/{status}', [PermohonanController::class, 'updateStatus'])->Middleware('auth', 'role:admin|super-admin|pengelola-permohonan')->name('permohonan.updateStatus');
 Route::get('/permohonan/download/{userId}', [PermohonanController::class, 'download'])->name('permohonan.download');
 
-// Route::get('user/{id}/permissions', [UserController::class, 'permissions'])->name('user.permissions');
-// Route::post('user/{id}/permissions', [UserController::class, 'updatePermissions'])->name('user.updatePermissions');
+Route::get('user/{id}/permissions', [UserController::class, 'permissions'])->name('user.permissions');
+Route::post('user/{id}/permissions', [UserController::class, 'updatePermissions'])->name('user.updatePermissions');
 
 //route untuk pengelolaan roles
 Route::middleware(['auth', 'permission:tambah-role', 'permission:edit-role', 'permission:hapus-role'])->group(function () {
@@ -62,6 +75,10 @@ Route::middleware(['auth', 'permission:tambah-role', 'permission:edit-role', 'pe
 //route untuk pengelolaan permissions
 Route::middleware(['auth', 'permission:tambah-permission', 'permission:edit-permission', 'permission:hapus-permission'])->group(function () {
 Route::resource('permission', PermissionController::class);
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/admin/users', [UserController::class, 'admin'])->name('user.admin');
 });
 
 // Route::get('admin',function(){

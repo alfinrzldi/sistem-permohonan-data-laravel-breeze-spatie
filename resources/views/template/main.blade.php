@@ -20,31 +20,57 @@
     <button type="button" class="text-2xl text-gray-600 sidebar-toggle">
         <i class="ri-menu-line"></i>
     </button>
-    <ul class="flex items-center text-base ml-4 ">
+    {{-- <ul class="flex items-center text-base ml-4 ">
         <li class="font-poppins mr-2">
             <a href="{{route('dashboard')}}" class="text-xl ri-home-2-line hover:text-gray-500">Home</a>
         </li>
-        <li class="mr-2">
+        {{-- <li class="mr-2">
             <form action="{{ route('logout') }}" method="POST" class="inline">
                 @csrf
                 <button type="submit" class="text-xl ri-logout-box-r-line font-poppins hover:text-gray-500">
                     Keluar
                 </button>
             </form>
-        </li>
-    </ul>
+        </li> --}}
+    {{-- </ul>  --}}
 
     <ul class="ml-auto flex items-center">
-        <li class="dropdown mr-2">
-            <button type="button" class="dropdown-toggle text-gray-400 w-8 h-8 rounded flex items-center justify-center hover:bg-gray-50 hover:text-gray-600">
-                <i class="ri-notification-3-line"></i>
+        <!-- Dropdown untuk Gambar Profil, Profil, dan Logout -->
+        <li class="mr-4 relative">
+            <button id="userDropdownButton" class="cursor-pointer focus:outline-none flex items-center">
+                <!-- Gambar Profil Pengguna Default -->
+                <img src="{{ asset('img/icon-default.png') }}" alt="User Profile" class="w-10 h-10 rounded-full">
             </button>
-            <div class="dropdown-menu shadow-md shadow-black/5 z-30 hidden max-w-xs w-full bg-white rounded-md border border-gray-100">
+            
+            <!-- Tombol Profil dan Logout Muncul saat Diklik -->
+            <div id="userDropdownMenu" class="absolute right-0 mt-3 hidden bg-white shadow-lg rounded-md">
+                <!-- Tombol Profil dengan Ikon -->
+                <a href="{{ route('profile.edit') }}" class="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm">
+                    <i class="ri-user-line text-lg mr-2"></i> <!-- Ikon Profil -->
+                    Profil
+                </a>
+                
+                <form action="{{ route('logout') }}" method="POST" class="block w-full text-left">
+                    @csrf
+                    <!-- Tombol Logout dengan Ikon -->
+                    <button type="submit" class="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-gray-100 text-sm">
+                        <i class="ri-logout-box-r-line text-lg mr-2"></i> <!-- Ikon Logout -->
+                        Keluar
+                    </button>
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+            {{-- <button type="button" class="dropdown-toggle text-gray-400 w-8 h-8 rounded flex items-center justify-center hover:bg-gray-50 hover:text-gray-600">
+                {{-- <i class="ri-notification-3-line"></i> --}}
+            {{-- </button>  --}}
+            {{-- <div class="dropdown-menu shadow-md shadow-black/5 z-30 hidden max-w-xs w-full bg-white rounded-md border border-gray-100">
                 <div class="flex items-center px-4 pt-4 border-b border-b-gray-100 notification-tab">
                     <button type="button" data-tab="notification" data-tab-page="notifications" class="text-gray-400 font-medium text-[13px] hover:text-gray-600 border-b-2 border-b-transparent mr-4 pb-1 active">Notifications</button>
                 </div>
                 <div class="my-2"> 
-                    <ul class="max-h-64 overflow-y-auto" data-tab-for="notification" data-page="notifications">
+                    <ul class="max-h-64 overflow-y-auto" data-tab-for="notification" data-page="notifications"> --}}
                             {{-- <li>
                                 <a href="{{ route('permohonan.show', $notification->data['permohonan_id']) }}" class="py-2 px-4 flex items-center hover:bg-gray-50 group">
                                     <img src="https://placehold.co/32x32" alt="" class="w-8 h-8 rounded block object-cover align-middle">
@@ -112,6 +138,26 @@
     });
 });
 
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const userDropdownButton = document.getElementById("userDropdownButton");
+        const userDropdownMenu = document.getElementById("userDropdownMenu");
+
+        // Tampilkan/Sembunyikan menu dropdown saat nama pengguna diklik
+        userDropdownButton.addEventListener("click", function (event) {
+            event.stopPropagation(); // Cegah peristiwa klik dari menyebar
+            userDropdownMenu.classList.toggle("hidden"); // Toggle hidden
+        });
+
+        // Sembunyikan dropdown jika klik di luar area dropdown
+        document.addEventListener("click", function (event) {
+            if (!userDropdownButton.contains(event.target) && !userDropdownMenu.contains(event.target)) {
+                userDropdownMenu.classList.add("hidden");
+            }
+        });
+    });
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

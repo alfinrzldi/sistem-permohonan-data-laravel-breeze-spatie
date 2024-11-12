@@ -17,7 +17,7 @@
         @if(auth()->user()->hasRole('super-admin') || auth()->user()->hasRole('admin'))
             <form method="GET" action="{{ route('permohonan.index') }}" class="mt-4 mb-4">
                 <div class="flex space-x-2">
-                    <select name="status" class="border rounded-md p-2">
+                    <select name="status" class="border rounded-md p-3">
                         <option value="">Semua Status</option>
                         <option value="Menunggu" {{ request('status') == 'Menunggu' ? 'selected' : '' }}>Menunggu</option>
                         <option value="Ditolak" {{ request('status') == 'Ditolak' ? 'selected' : '' }}>Ditolak</option>
@@ -40,7 +40,7 @@
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dibuat Pada</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Waktu Selesai</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Detail</th>
-                    @if(auth()->user()->hasRole('super-admin') || auth()->user()->hasRole('admin'))
+                    @if(auth()->user()->hasRole('super-admin') || auth()->user()->hasRole('admin') || auth()->user()->hasRole('pengelola-permohonan'))
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Update</th>
                     @endif
                 </tr>
@@ -76,51 +76,68 @@
                     <td class="px-6 py-4 whitespace-nowrap">{{ $item->waktu_selesai ?? 'Tidak ada waktu' }}</td>
 
                     <!-- Kolom Detail dan Download untuk Pemohon -->
-                    @if(auth()->user()->hasRole('pemohon'))
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <a href="{{ route('permohonan.show', $item->id) }}" class="text-stone-700 hover:underline"><i class="ri-eye-line"></i> Detail</a>
-                            @if($item->file_upload) <!-- Cek jika file sudah diupload -->
-                                <br>
-                                <a href="{{ route('permohonan.download', $item->id) }}" class="text-purple-500 hover:underline">
-                                    <i class="ri-download-cloud-line"></i> Download
-                                </a>
-                            @endif
-                        </td>
-                    @elseif(auth()->user()->hasRole('super-admin') || auth()->user()->hasRole('admin'))
-                        <!-- Aksi untuk admin -->
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <a href="{{ route('permohonan.updateStatus', ['id' => $item->id, 'status' => 'Diproses']) }}" class="text-orange-400 hover:underline">
-                                <i class="ri-reset-right-line"></i> Diproses
-                            </a>
+                    @if(auth()->user()->hasRole('role:pemohon'))
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <a href="{{ route('permohonan.show', $item->id) }}" class="text-stone-700 hover:underline">
+                            <i class="ri-eye-line"></i> Detail
+                        </a>
+                        @if($item->file_upload) <!-- Cek jika file sudah diupload -->
                             <br>
-                            <a href="{{ route('permohonan.updateStatus', ['id' => $item->id, 'status' => 'Diterima']) }}" class="text-green-600 hover:underline">
-                                <i class="ri-checkbox-circle-line"></i> Diterima
+                            <a href="{{ route('permohonan.download', $item->id) }}" class="text-purple-500 hover:underline">
+                                <i class="ri-download-cloud-line"></i> Download
                             </a>
-                            <br>
-                            <a href="{{ route('permohonan.updateStatus', ['id' => $item->id, 'status' => 'Ditolak']) }}" class="text-red-600 hover:underline">
-                                <i class="ri-close-circle-line"></i> Ditolak
-                            </a>
-                            <br>
-                            <!-- Tombol upload dengan validasi warna -->
-                            <a href="{{ route('permohonan.uploadForm', $item->id) }}"
-                               class="hover:underline {{ $item->file_upload ? 'text-green-600' : 'text-blue-600' }}">
-                                <i class="ri-upload-cloud-line"></i> Upload
-                            </a>
-                        </td>
-                        <!-- Kolom Update untuk admin -->
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <a href="{{ route('permohonan.show', $item->id) }}" class="text-stone-700 hover:underline"><i class="ri-eye-line"></i> Detail</a>
-                            <br><a href="{{ route('permohonan.edit', $item->id) }}" class="text-amber-600 hover:underline"><i class="ri-edit-2-line"></i> Edit</a>
-                            <br>
-                            <form action="{{ route('permohonan.destroy', $item->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin menghapus permohonan ini?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-red-600 hover:underline">
-                                    <i class="ri-delete-bin-line"></i> Hapus
-                                </button>
-                            </form>
-                        </td>
+                        @endif
+                    </td>
+                @endif
+                
+                @if(auth()->user()->hasRole('super-admin') || auth()->user()->hasRole('admin') || auth()->user()->hasRole('pengelola-permohonan'))
+                <!-- Aksi untuk admin -->
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <a href="{{ route('permohonan.updateStatus', ['id' => $item->id, 'status' => 'Diproses']) }}" class="text-orange-400 hover:underline">
+                        <i class="ri-reset-right-line"></i> Diproses
+                    </a>
+                    <br>
+                    <a href="{{ route('permohonan.updateStatus', ['id' => $item->id, 'status' => 'Diterima']) }}" class="text-green-600 hover:underline">
+                        <i class="ri-checkbox-circle-line"></i> Diterima
+                    </a>
+                    <br>
+                    <a href="{{ route('permohonan.updateStatus', ['id' => $item->id, 'status' => 'Ditolak']) }}" class="text-red-600 hover:underline">
+                        <i class="ri-close-circle-line"></i> Ditolak
+                    </a>
+                    <br>
+                    <!-- Tombol upload dengan validasi warna -->
+                    <a href="{{ route('permohonan.uploadForm', $item->id) }}"
+                        class="hover:underline {{ $item->file_upload ? 'text-green-600' : 'text-blue-600' }}">
+                        <i class="ri-upload-cloud-line"></i> Upload
+                    </a>
+                </td>
+            
+                <!-- Kolom Update untuk admin -->
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <a href="{{ route('permohonan.show', $item->id) }}" class="text-stone-700 hover:underline"><i class="ri-eye-line"></i> Detail</a>
+                    <br>
+                    <a href="{{ route('permohonan.edit', $item->id) }}" class="text-amber-600 hover:underline"><i class="ri-edit-2-line"></i> Edit</a>
+                    <br>
+                    <form action="{{ route('permohonan.destroy', $item->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin menghapus permohonan ini?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="text-red-600 hover:underline">
+                            <i class="ri-delete-bin-line"></i> Hapus
+                        </button>
+                    </form>
+                </td>
+            @else
+                <!-- Aksi untuk role selain admin atau super-admin -->
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <a href="{{ route('permohonan.show', $item->id) }}" class="text-stone-700 hover:underline"><i class="ri-eye-line"></i> Detail</a>
+                    @if($item->file_upload) <!-- Cek jika file sudah diupload -->
+                        <br>
+                        <a href="{{ route('permohonan.download', $item->id) }}" class="text-purple-500 hover:underline">
+                            <i class="ri-download-cloud-line"></i> Download
+                        </a>
                     @endif
+                </td>
+            @endif            
                 </tr>
                 @endforeach
             </tbody>                

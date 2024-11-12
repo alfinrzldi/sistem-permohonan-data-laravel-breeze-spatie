@@ -19,9 +19,18 @@
                 </label>
                 <label class="block mb-6">
                     <span class="mb-2 after:content-['*'] after:ml-0.5 after:text-red-500 block text-sm font-poppins text-slate-700">
-                      Email (Masukkan email yang digunakan untuk login)
+                        Email (Masukkan email yang digunakan untuk login)
                     </span>
-                    <input id="email" required type="email" name="email" class="mt-1 px-3 py-2 bg-gray-100 border shadow-sm border-slate-200 placeholder-slate-400 focus:outline-none focus:border-gray-300 focus:ring-gray-300 block w-full rounded-md sm:text-sm focus:ring-1" placeholder="Masukkan Email" />
+                    <input 
+                        id="email" 
+                        required 
+                        type="email" 
+                        name="email" 
+                        value="{{ auth()->user()->email }}" 
+                        class="mt-1 px-3 py-2 bg-gray-100 border shadow-sm border-slate-200 placeholder-slate-400 focus:outline-none focus:border-gray-300 focus:ring-gray-300 block w-full rounded-md sm:text-sm focus:ring-1" 
+                        placeholder="Masukkan Email" 
+                        readonly
+                    />
                 </label>
                 <label class="block mb-6">
                     <span class="mb-2 after:content-['*'] after:ml-0.5 after:text-red-500 block text-sm font-poppins text-slate-700">
@@ -49,7 +58,7 @@
                 </label>
                 <label class="block mb-6">
                     <span class="mb-2 after:content-['*'] after:ml-0.5 after:text-red-500 block text-sm font-poppins text-slate-700">
-                      Upload Identitas
+                      Upload Identitas (Foto KTP)
                     </span>
                     <input type="file" required name="file_identitas" class="mt-1 px-3 py-2 bg-gray-100 border shadow-sm border-slate-200 placeholder-gray-400 focus:outline-none focus:border-gray-300 focus:ring-gray-300 block w-full rounded-md sm:text-sm focus:ring-1" />
                 </label>

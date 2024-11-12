@@ -7,6 +7,7 @@ use App\Models\Permohonan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage; 
 use App\Models\Survey;
+use Carbon\Carbon;
 use App\Notifications\PermohonanSelesaiNotification;
 use Illuminate\Support\Facades\Notification;
 
@@ -22,35 +23,39 @@ class PermohonanController extends Controller
     // Cek apakah ada permohonan yang berkaitan dengan user dan sudah ada file_upload
     $permohonan = Permohonan::where('email', $user->email)->first();
 
-    // if ($permohonan && $permohonan->file_upload) {
-    //     // Cek apakah user sudah mengisi survey
-    //     $survey = Survey::where('user_id', $user->id)->first();
+    if ($permohonan && $permohonan->file_upload) {
+        // Cek apakah user sudah mengisi survey
+        $survey = Survey::where('user_id', $user->id)->first();
     
-    //     if (!$survey) {
-    //         // Jika user belum mengisi survey, arahkan ke halaman survey
-    //         return redirect()->route('survey.index', ['permohonan' => $permohonan->id])->with('info', 'Silakan isi survey sebelum melanjutkan.');
-    //     }
-    // }
+        if (!$survey) {
+            // Jika user belum mengisi survey, arahkan ke halaman survey
+            return redirect()->route('survey.index', ['permohonan' => $permohonan->id])->with('info', 'Silakan isi survey sebelum melanjutkan.');
+        }
+    }
     
 
     // Inisialisasi query untuk permohonan
     $query = Permohonan::query();
 
-    // Cek jika pengguna adalah pemohon
-    if ($user->role == 'pemohon') {
-        // Mengambil permohonan berdasarkan email pengguna yang login
-        $query->where('email', $user->email);
-    }
+  // Cek apakah pengguna memiliki role 'pemohon'
+if ($user->hasRole('pemohon')) {
+    // Jika pengguna memiliki role 'pemohon', ambil permohonan berdasarkan email pengguna yang login
+    $query = Permohonan::where('email', $user->email);
+} else {
+    // Jika pengguna bukan pemohon, ambil semua permohonan
+    $query = Permohonan::query();
+}
 
-    // Tambahkan filter berdasarkan status jika ada
-    if ($request->has('status') && !empty($request->status)) {
-        $query->where('status', $request->status);
-    }
 
-    // Ambil data permohonan
-    $permohonan = $query->get();
+// Tambahkan filter berdasarkan status jika ada
+if ($request->has('status') && !empty($request->status)) {
+    $query->where('status', $request->status);
+}
 
-    return view('permohonan.index', compact('permohonan'));
+// Ambil data permohonan
+$permohonan = $query->get();
+
+return view('permohonan.index', compact('permohonan'));
 }
 
     
@@ -65,63 +70,62 @@ class PermohonanController extends Controller
 
     // Method untuk menyimpan data permohonan
     public function store(Request $request)
-    {
+{
+    // Validasi input
+    $request->validate([
+        'nama_lengkap' => 'required|string',
+        'email' => 'required|email',
+        'nomor_iden' => 'required',
+        'alamat' => 'required',
+        'telephone' => 'required',
+        'pekerjaan' => 'required',
+        'nama_perusahaan' => 'required',
+        'alamat_perusahaan' => 'required',
+        'rincian_informasi' => 'required|string',
+        'jenis_informasi' => 'nullable|array',
+        'informasi_lainnya' => 'nullable|string',
+        'tujuan_penggunaan' => 'nullable|array',
+        'tujuan_lainnya' => 'nullable|string',
+        'file_identitas' => 'required|file',
+        'waktu_selesai' => 'nullable|date', // Buat waktu_selesai menjadi opsional
+    ]);
 
-        // dd($request->all());
-
-        // Validasi input
-        $request->validate([
-            'nama_lengkap' => 'required|string',
-            'email' => 'required|email',
-            'nomor_iden' => 'required',
-            'alamat' => 'required',
-            'telephone' => 'required',
-            'pekerjaan' => 'required',
-            'nama_perusahaan' => 'required',
-            'alamat_perusahaan' => 'required',
-            'rincian_informasi' => 'required|string',
-            'jenis_informasi' => 'nullable|array',
-            'informasi_lainnya' => 'nullable|string',
-            'tujuan_penggunaan' => 'nullable|array',
-            'tujuan_lainnya' => 'nullable|string',
-            'file_identitas' => 'required|file',
-            'waktu_selesai' => 'nullable|date', // Buat waktu_selesai menjadi opsional
-        ]);
-        
-
-        // Proses array checkbox menjadi string
+    // Proses array checkbox menjadi string
     $jenis_informasi = isset($request->jenis_informasi) ? implode(',', $request->jenis_informasi) : '';
     $tujuan_penggunaan = isset($request->tujuan_penggunaan) ? implode(',', $request->tujuan_penggunaan) : '';
 
-        // Proses file upload
-        if ($request->hasFile('file_identitas')) {
-            $path = $request->file('file_identitas')->store('identitas', 'public');
-        } else {
-            $path = null;
-        }
-
-        // Simpan data ke database
-        $permohonan = new Permohonan();
-        $permohonan->nama_lengkap = $request->nama_lengkap;
-        $permohonan->email = $request->email;
-        $permohonan->nomor_iden = $request->nomor_iden;
-        $permohonan->alamat = $request->alamat;
-        $permohonan->telphone = $request->telephone;
-        $permohonan->pekerjaan = $request->pekerjaan;
-        $permohonan->nama_perusahaan = $request->nama_perusahaan;
-        $permohonan->alamat_perusahaan = $request->alamat_perusahaan;
-        $permohonan->jenis_informasi = $jenis_informasi; // Hasil implode
-        $permohonan->informasi_lainnya = $request->informasi_lainnya;
-        $permohonan->rincian_informasi = $request->rincian_informasi;
-        $permohonan->tujuan_penggunaan = $tujuan_penggunaan; // Hasil implode
-        $permohonan->tujuan_lainnya = $request->tujuan_lainnya;
-        $permohonan->file_identitas = $path; // Path file yang disimpan
-        $permohonan->waktu_selesai = $request->waktu_selesai; // Simpan waktu_selesai
-        $permohonan->save();
-
-         // Redirect ke halaman indeks setelah berhasil
-    return redirect()->route('permohonan.index')->with('success', 'Permohonan berhasil dikirim!');
+    // Proses file upload
+    if ($request->hasFile('file_identitas')) {
+        $path = $request->file('file_identitas')->store('identitas', 'public');
+    } else {
+        $path = null;
     }
+
+    // Jika 'waktu_selesai' tidak diisi, set otomatis menjadi 7 hari dari sekarang
+    $waktuSelesai = $request->waktu_selesai ?: Carbon::now()->addDays(7);
+
+    // Simpan data ke database
+    $permohonan = new Permohonan();
+    $permohonan->nama_lengkap = $request->nama_lengkap;
+    $permohonan->email = $request->email;
+    $permohonan->nomor_iden = $request->nomor_iden;
+    $permohonan->alamat = $request->alamat;
+    $permohonan->telphone = $request->telephone;
+    $permohonan->pekerjaan = $request->pekerjaan;
+    $permohonan->nama_perusahaan = $request->nama_perusahaan;
+    $permohonan->alamat_perusahaan = $request->alamat_perusahaan;
+    $permohonan->jenis_informasi = $jenis_informasi; // Hasil implode
+    $permohonan->informasi_lainnya = $request->informasi_lainnya;
+    $permohonan->rincian_informasi = $request->rincian_informasi;
+    $permohonan->tujuan_penggunaan = $tujuan_penggunaan; // Hasil implode
+    $permohonan->tujuan_lainnya = $request->tujuan_lainnya;
+    $permohonan->file_identitas = $path; // Path file yang disimpan
+    $permohonan->waktu_selesai = $waktuSelesai; // Simpan waktu_selesai yang sudah otomatis ditambahkan
+    $permohonan->save();
+
+    // Redirect ke halaman indeks setelah berhasil
+    return redirect()->route('permohonan.index')->with('success', 'Permohonan berhasil dikirim!');
+}
 
     // Method untuk menampilkan detail permohonan
     public function show($id)
@@ -131,9 +135,9 @@ class PermohonanController extends Controller
         $user = Auth::user();
 
          // Cek apakah pengguna adalah 'pemohon' dan email tidak cocok
-     if ($user->role == 'pemohon' && $permohonan->email !== $user->email) {
-        return redirect()->back()->with('error', 'Anda tidak memiliki akses untuk mendownload file ini.');
-    }   
+         if ($permohonan->email !== $user->email) {
+            return redirect()->back()->with('error', 'Anda tidak memiliki akses untuk melihat permohonan ini.');
+        }
 
         return view('permohonan.show', compact('permohonan'));
     }
@@ -240,9 +244,9 @@ public function download($id)
     $user = Auth::user();
 
      // Cek apakah pengguna adalah 'pemohon' dan email tidak cocok
-     if ($user->role == 'pemohon' && $permohonan->email !== $user->email) {
+     if ($permohonan->email !== $user->email) {
         return redirect()->back()->with('error', 'Anda tidak memiliki akses untuk mendownload file ini.');
-    }   
+    }
 
     // Path ke file yang ingin di-download
     $filePath = storage_path('app/public/' . $permohonan->file_upload); // Pastikan file berada di kolom file_upload

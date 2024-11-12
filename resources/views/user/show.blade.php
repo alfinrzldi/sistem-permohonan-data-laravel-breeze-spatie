@@ -9,14 +9,14 @@
 <div class="px-2 py-1">
     <div class="bg-white rounded-md border border-gray-600 shadow-lg p-6">
         <div class="space-y-6">
-            <div class="mb-4">
+            {{-- <div class="mb-4">
                 <label class="font-medium">Photo Profile:</label>
                 @if($user->photo) <!-- Menampilkan foto jika ada -->
                     <img src="{{ asset('storage/' . $user->photo) }}" alt="Profile Photo" class="mt-1 w-32 h-32 object-cover rounded-full" />
                 @else
                     <p class="text-gray-700">Tidak ada foto profil</p>
                 @endif
-            </div>
+            </div> --}}
             <div class="mb-4">
                 <label class="font-medium">Nama Lengkap:</label>
                 <p class="text-gray-700">{{ $user->name }}</p>

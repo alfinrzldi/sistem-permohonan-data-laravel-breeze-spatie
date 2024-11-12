@@ -10,9 +10,12 @@ class RoleController extends Controller
 {
     public function index()
     {
-        $roles = Role::all();
+        // Ambil semua role kecuali 'super-admin'
+        $roles = Role::where('name', '!=', 'super-admin')->get();
+    
         return view('role.index', compact('roles'));
     }
+    
 
     public function create()
 {
@@ -22,13 +25,25 @@ class RoleController extends Controller
 }
 
 
-    public function store(Request $request)
-    {
-        $request->validate(['name' => 'required|unique:roles']);
-        Role::create(['name' => $request->name]);
-        
-        return redirect()->route('role.index')->with('success', 'Role berhasil ditambahkan');
+public function store(Request $request)
+{
+    // Validasi input nama role
+    $request->validate(['name' => 'required|unique:roles']);
+
+    // Buat role baru
+    $role = Role::create(['name' => $request->name]);
+
+    // Cek apakah ada permissions yang dikirimkan
+    if ($request->has('permissions')) {
+        // Ambil nama permissions berdasarkan ID yang dipilih
+        $permissions = Permission::whereIn('id', $request->permissions)->pluck('name')->toArray();
+
+        // Kaitkan permissions dengan role
+        $role->syncPermissions($permissions);
     }
+
+    return redirect()->route('role.index')->with('success', 'Role dan permissions berhasil ditambahkan');
+}
 
 
 public function edit($id)
