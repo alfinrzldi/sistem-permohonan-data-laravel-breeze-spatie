@@ -35,6 +35,13 @@
 
                 <form method="POST" action="{{ route('login') }}">
                     @csrf
+
+                     <!-- Display Success Message if available -->
+        @if(session('success'))
+        <div class="mb-4 text-sm text-green-600">
+            {{ session('success') }}
+        </div>
+    @endif
                     <!-- Email Address -->
                     <div class="mb-6 w-full">
                         <x-input-label for="email" :value="__('Email')" class="block text-gray-900 text-md"/>
@@ -52,6 +59,13 @@
                     <button type="submit" class="w-full bg-black text-white font-semibold py-3 rounded-lg text-lg hover:bg-gray-800 transition duration-500">
                         {{ __('Log in') }}
                     </button>
+
+                    <!-- Forgot Password Link -->
+                    <div class="text-center mt-4">
+                        <a href="{{ route('password.request') }}" class="text-gray-600 hover:text-gray-800 text-sm">
+                            {{ __('Lupa kata sandi?') }}
+                        </a>
+                    </div>
                 </form>
             </div>
 

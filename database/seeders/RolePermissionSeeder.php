@@ -35,6 +35,10 @@ class RolePermissionSeeder extends Seeder
         
         Role::create(['name'=>'super-admin']);
 
+        Role::create(['name'=>'admin']);
+
+        Role::create(['name'=>'pemohon']);
+
 
         $rolesuperAdmin = Role::findByName('super-admin');
         $rolesuperAdmin->givePermissionTo('tambah-user');
@@ -52,6 +56,19 @@ class RolePermissionSeeder extends Seeder
         $rolesuperAdmin->givePermissionTo('edit-permission');
         $rolesuperAdmin->givePermissionTo('hapus-permission');
 
-        
+        $roleAdmin = role::findByName('admin');
+        $roleAdmin->givePermissionTo('tambah-permohonan');
+        $roleAdmin->givePermissionTo('edit-permohonan');
+        $roleAdmin->givePermissionTo('lihat-permohonan');
+        $roleAdmin->givePermissionTo('hapus-permohonan');
+        $roleAdmin->givePermissionTo('tambah-user');
+        $roleAdmin->givePermissionTo('edit-user');
+        $roleAdmin->givePermissionTo('lihat-user'); 
+        $roleAdmin->givePermissionTo('hapus-user');
+
+        $roleClient = role::findByName('pemohon');
+        $roleClient->givePermissionTo('tambah-permohonan');
+        $roleClient->givePermissionTo('lihat-permohonan');
+
     }
 }

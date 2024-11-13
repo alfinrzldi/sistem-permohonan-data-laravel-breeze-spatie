@@ -51,16 +51,16 @@
                 </li>
                 
                 @if (auth()->user()->hasRole('super-admin'))
-                <li>
+                {{-- <li>
                     <a href="{{ route('role.index') }}" class="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-200 rounded">
                         <i class="ri-user-settings-fill text-xl mr-2"></i></i>Kelola Peran
                     </a>
-                </li>
-                <li>
+                </li> --}}
+                {{-- <li>
                     <a href="{{ route('permission.index') }}" class="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-200 rounded">
                         <i class="ri-shield-user-fill text-xl mr-2"></i>Kelola Hak Akses
                     </a>
-                </li>
+                </li> --}}
                 @endif
             </ul>            
         </li>

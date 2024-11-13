@@ -24,7 +24,7 @@
                     </span>
                     <input id="email" required type="email" name="email" value="{{ old('email', $user->email) }}" class="mt-1 px-3 py-2 bg-gray-100 border shadow-sm border-slate-200 placeholder-slate-400 focus:outline-none focus:border-gray-300 focus:ring-gray-300 block w-full rounded-md sm:text-sm focus:ring-1" placeholder="Masukkan Email" />
                 </label> 
-                <label for="role" class="block mb-6">
+                {{-- <label for="role" class="block mb-6">
                     <span class="mb-2 after:content-['*'] after:ml-0.5 after:text-red-500 block text-sm font-poppins text-slate-700">
                         Role
                     </span>
@@ -39,7 +39,7 @@
                         @endforeach
                     </select>
                 </label>
-                
+                 --}}
                 <label class="block mb-6">
                     <span class="mb-2 after:content-['*'] after:ml-0.5 after:text-red-500 block text-sm font-poppins text-slate-700">
                       Password

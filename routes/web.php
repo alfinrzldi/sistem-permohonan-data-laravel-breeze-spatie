@@ -49,8 +49,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('permohonan/{permohonan}', [PermohonanController::class, 'destroy'])->middleware('auth', 'role:admin|super-admin|pengelola-permohonan')->name('permohonan.destroy');
 });
 
-Route::get('/user/create_admin', [UserController::class, 'create_admin'])->name('user.create_admin');
-Route::post('/user/store_admin', [UserController::class, 'store_admin'])->name('user.store_admin');
+Route::get('/user/create_admin', [UserController::class, 'create_admin'])->middleware('auth', 'role:super-admin')->name('user.create_admin');
+Route::post('/user/create_admin', [UserController::class, 'storeAdmin'])->name('user.store_admin'); // Untuk menyimpan data (POST)
 
 
 // Route::resource('permohonan', PermohonanController::class)->middleware(['auth', 'role:admin']);

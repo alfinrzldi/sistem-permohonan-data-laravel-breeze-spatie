@@ -38,6 +38,29 @@ class UserController extends Controller
         return view('user.create_admin', compact('roles', 'permissions'));
     }
 
+    public function storeAdmin(Request $request)
+    {
+        // Validasi email ada di tabel users
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if ($user) {
+            // Berikan role admin jika user ditemukan
+            $role = Role::where('name', 'admin')->first();
+            if ($role) {
+                $user->syncRoles([$role->name]);
+                return redirect()->route('user.admin')->with('success', 'User berhasil diubah menjadi admin.');
+            } else {
+                return redirect()->back()->withErrors(['error' => 'Role admin tidak ditemukan.']);
+            }
+        } else {
+            return redirect()->back()->withErrors(['email' => 'Email tidak ditemukan dalam sistem.']);
+        }
+    }
+
     // Metode untuk menyimpan data user
     public function store(Request $request)
     {
@@ -78,11 +101,22 @@ class UserController extends Controller
 
     // Menampilkan form untuk edit user
     public function edit($id)
-    {
-        $user = User::findOrFail($id); // Menemukan pengguna berdasarkan ID
-        $roles = Role::where('name', '!=', 'super-admin')->get(); // Mengambil semua role kecuali super-admin
-        return view('user.edit', compact('user', 'roles'));
+{
+    $user = User::findOrFail($id); // Menemukan pengguna berdasarkan ID
+
+    // Memastikan hanya super-admin yang dapat mengedit user dengan role 'admin'
+    if (auth()->user()->hasRole('admin') && $user->hasRole('admin')) {
+        // Jika yang mengedit adalah admin dan yang akan diedit juga admin
+        abort(403, 'Anda tidak memiliki izin untuk mengedit admin');
     }
+
+    // Mengambil semua role kecuali super-admin
+    $roles = Role::where('name', '!=', 'super-admin')->get();
+
+    // Kembalikan view edit dengan data pengguna dan role
+    return view('user.edit', compact('user', 'roles'));
+}
+
 
     // Update user
     public function update(Request $request, $id)

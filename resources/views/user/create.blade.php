@@ -28,7 +28,6 @@
                     <input id="email" required type="email" name="email" class="mt-1 px-3 py-2 bg-gray-100 border shadow-sm border-slate-200 placeholder-slate-400 focus:outline-none focus:border-gray-300 focus:ring-gray-300 block w-full rounded-md sm:text-sm focus:ring-1" placeholder="Masukkan Email" />
                 </label>
 
-                  <!-- Role: Admin -->
                   <input type="hidden" name="role" value="pemohon">
 
                 <!-- Password -->
